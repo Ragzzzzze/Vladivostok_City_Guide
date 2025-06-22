@@ -20,10 +20,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vladivostokcityguide.data.model.Attraction
+import com.example.vladivostokcityguide.R
 import com.example.vladivostokcityguide.ui.theme.Black
 import com.example.vladivostokcityguide.ui.theme.DarkGray80
 import com.example.vladivostokcityguide.ui.theme.DarkGray90
@@ -221,7 +223,7 @@ fun AttractionCard(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "Start",
+                            text = stringResource(R.string.button_start),
                             fontSize = 12.sp,
                             color = Black
                         )

@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">VladivostokCityGuide</string>
+    <string name="head_welcome">Welcome to</string>
+    <string name="head_city">Vladivostok</string>
+    <string name="category_theater">Theaters</string>
+    <string name="category_statue">Statues</string>
+    <string name="category_museums">Museums</string>
+    <string name="category_others">Others</string>
+
+    <string name="button_start">Start</string>
 </resources>

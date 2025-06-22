@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import com.example.vladivostokcityguide.ui.theme.NeonGreen
 import com.example.vladivostokcityguide.ui.theme.Purple
 import com.example.vladivostokcityguide.ui.theme.SalmonPink
 import com.example.vladivostokcityguide.ui.theme.White
+import com.example.vladivostokcityguide.R
 
 @Composable
 fun WelcomeScreen(
@@ -34,7 +36,6 @@ fun WelcomeScreen(
             .fillMaxSize()
             .background(Black)
     ) {
-        // Welcome section
         Column(
             modifier = Modifier
                 .padding(top = 60.dp)
@@ -42,20 +43,19 @@ fun WelcomeScreen(
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = "Welcome to",
+                text = stringResource(R.string.head_welcome),
                 color = White,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Light
             )
             Text(
-                text = "Vladivostok",
+                text = stringResource(R.string.head_city),
                 color = White,
                 fontSize = 64.sp,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        // Tabs section
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -66,7 +66,7 @@ fun WelcomeScreen(
             ) {
                 Box(modifier = Modifier.weight(1f)) {
                     CategoryTab(
-                        title = "Theaters",
+                        title = stringResource(R.string.category_theater),
                         count = "10 places",
                         color = AlgaeBlue,
                         modifier = Modifier.fillMaxSize()
@@ -77,7 +77,7 @@ fun WelcomeScreen(
 
                 Box(modifier = Modifier.weight(1f)) {
                     CategoryTab(
-                        title = "Statues",
+                        title = stringResource(R.string.category_statue),
                         count = "25 places",
                         color = SalmonPink,
                         modifier = Modifier
@@ -89,7 +89,7 @@ fun WelcomeScreen(
 
                 Box(modifier = Modifier.weight(1f)) {
                     CategoryTab(
-                        title = "Museums",
+                        title = stringResource(R.string.category_museums),
                         count = "16 places",
                         color = Purple,
                         modifier = Modifier
@@ -101,7 +101,7 @@ fun WelcomeScreen(
 
                 Box(modifier = Modifier.weight(1f)) {
                     CategoryTab(
-                        title = "Shopping",
+                        title = stringResource(R.string.category_others),
                         count = "8 places",
                         color = NeonGreen,
                         modifier = Modifier
@@ -145,7 +145,6 @@ fun CategoryTab(
                     modifier = Modifier.size(34.dp)
                 )
 
-                // Changed from Text to TextButton
                 TextButton(
                     onClick = onViewAllClick,
                     colors = ButtonDefaults.textButtonColors(
