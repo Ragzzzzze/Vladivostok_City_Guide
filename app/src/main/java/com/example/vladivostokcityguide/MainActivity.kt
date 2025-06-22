@@ -4,13 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.vladivostokcityguide.presentation.MapScreen.RequestLocationPermission
+import com.example.vladivostokcityguide.presentation.navigation.AppNavigation
 import com.example.vladivostokcityguide.ui.theme.VladivostokCityGuideTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +14,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VladivostokCityGuideTheme {
-                Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                RequestLocationPermission()
+                AppNavigation()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    VladivostokCityGuideTheme {
-        Greeting("Android")
     }
 }

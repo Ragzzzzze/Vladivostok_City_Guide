@@ -41,6 +41,17 @@ android {
 
 dependencies {
 
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.maps.android:maps-compose:4.3.0")
+    implementation ("com.google.accompanist:accompanist-permissions:0.32.0")
+
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+
+    implementation ("androidx.navigation:navigation-compose:2.7.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
