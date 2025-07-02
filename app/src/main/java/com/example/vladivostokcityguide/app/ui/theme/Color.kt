@@ -1,4 +1,4 @@
-package com.example.vladivostokcityguide.ui.theme
+package com.example.vladivostokcityguide.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -21,3 +21,5 @@ val White = Color(0xFFFFFFFF)
 val DarkerBlack = Color(0xFF121212)
 val DarkGray90 = Color(0xFF1E1E1E)
 val DarkGray80 = Color(0xFF2D2D2D)
+
+val VkBlue = Color(0xFF2683ED)

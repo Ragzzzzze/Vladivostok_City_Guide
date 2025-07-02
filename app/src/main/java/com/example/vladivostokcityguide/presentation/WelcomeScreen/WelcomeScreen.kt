@@ -1,14 +1,16 @@
 package com.example.vladivostokcityguide.presentation.WelcomeScreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,17 +21,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.vladivostokcityguide.ui.theme.AlgaeBlue
-import com.example.vladivostokcityguide.ui.theme.Black
-import com.example.vladivostokcityguide.ui.theme.NeonGreen
-import com.example.vladivostokcityguide.ui.theme.Purple
-import com.example.vladivostokcityguide.ui.theme.SalmonPink
-import com.example.vladivostokcityguide.ui.theme.White
+import com.example.vladivostokcityguide.app.ui.theme.AlgaeBlue
+import com.example.vladivostokcityguide.app.ui.theme.Black
+import com.example.vladivostokcityguide.app.ui.theme.NeonGreen
+import com.example.vladivostokcityguide.app.ui.theme.Purple
+import com.example.vladivostokcityguide.app.ui.theme.SalmonPink
+import com.example.vladivostokcityguide.app.ui.theme.White
 import com.example.vladivostokcityguide.R
+import com.example.vladivostokcityguide.domain.PlaceCategory
+import com.example.vladivostokcityguide.presentation.WelcomeScreen.components.CategoryTab
 
 @Composable
 fun WelcomeScreen(
-    onCategoryClick: (String) -> Unit
+    onCategoryClick: (String) -> Unit,
+    navigateToFavorites: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -42,141 +47,84 @@ fun WelcomeScreen(
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            Text(
-                text = stringResource(R.string.head_welcome),
-                color = White,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Light
-            )
-            Text(
-                text = stringResource(R.string.head_city),
-                color = White,
-                fontSize = 64.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .padding(top = 0.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Box(modifier = Modifier.weight(1f)) {
-                    CategoryTab(
-                        title = stringResource(R.string.category_theater),
-                        count = "10 places",
-                        color = AlgaeBlue,
-                        modifier = Modifier.fillMaxSize()
-                            .offset(y = 75.dp),
-                        onViewAllClick = { onCategoryClick("Theaters") }
-                    )
-                }
-
-                Box(modifier = Modifier.weight(1f)) {
-                    CategoryTab(
-                        title = stringResource(R.string.category_statue),
-                        count = "25 places",
-                        color = SalmonPink,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .offset(y = (50).dp),
-                        onViewAllClick = { onCategoryClick("Statues") }
-                    )
-                }
-
-                Box(modifier = Modifier.weight(1f)) {
-                    CategoryTab(
-                        title = stringResource(R.string.category_museums),
-                        count = "16 places",
-                        color = Purple,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .offset(y = (25).dp),
-                        onViewAllClick = { onCategoryClick("Museums") }
-                    )
-                }
-
-                Box(modifier = Modifier.weight(1f)) {
-                    CategoryTab(
-                        title = stringResource(R.string.category_others),
-                        count = "8 places",
-                        color = NeonGreen,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .offset(y = (0).dp),
-                        onViewAllClick = { onCategoryClick("Others") }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CategoryTab(
-    title: String,
-    count: String,
-    color: Color,
-    modifier: Modifier = Modifier,
-    onViewAllClick: () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-            .background(color)
-            .padding(16.dp)
-            .wrapContentSize()
-    ) {
-        Column(
-            modifier = Modifier.padding(bottom = 40.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Category icon",
-                    tint = Black,
-                    modifier = Modifier.size(34.dp)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text = stringResource(R.string.head_welcome),
+                    color = White,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Light
                 )
-
-                TextButton(
-                    onClick = onViewAllClick,
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = Black
-                    )
+                Surface(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .clickable(onClick = navigateToFavorites),
+                    shape = CircleShape,
+                    color = Color.Gray.copy(alpha = 0.5f)
                 ) {
-                    Text(
-                        text = "View All",
-                        fontSize = 16.sp
-                    )
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Сердечко",
+                            tint = NeonGreen,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = title,
-                    color = Black,
-                    fontSize = 24.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+            Text(
+                text = stringResource(R.string.head_city) + " 🌊",
+                color = White,
+                fontSize = 45.sp,
+                fontWeight = FontWeight.Bold,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+        }
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+            Column() {
+
+                CategoryTab(
+                    title = stringResource(R.string.category_theater),
+                    count = "10 places",
+                    color = AlgaeBlue,
+                    modifier = Modifier
+                        .offset(y = 62.dp),
+                    emoji = "🎭",
+                    onClick = { onCategoryClick(PlaceCategory.THEATER.apiValue) }
                 )
 
-                Text(
-                    text = count,
-                    color = Black,
-                    fontSize = 24.sp
+                CategoryTab(
+                    title = stringResource(R.string.category_statue),
+                    count = "25 places",
+                    color = SalmonPink,
+                    emoji = "🗿",
+                    modifier = Modifier
+                        .offset(y = (42).dp),
+                    onClick = { onCategoryClick(PlaceCategory.STATUE.apiValue) }
+                )
+
+
+                CategoryTab(
+                    title = stringResource(R.string.category_museums),
+                    count = "16 places",
+                    color = Purple,
+                    emoji = "🏛️",
+                    modifier = Modifier
+                        .offset(y = (20).dp),
+                    onClick = { onCategoryClick(PlaceCategory.MUSEUM.apiValue) }
+                )
+
+                CategoryTab(
+                    title = stringResource(R.string.category_others),
+                    count = "8 places",
+                    emoji = "🗺️",
+                    color = NeonGreen,
+                    onClick = { onCategoryClick(PlaceCategory.OTHER.apiValue) }
                 )
             }
         }
+
     }
 }

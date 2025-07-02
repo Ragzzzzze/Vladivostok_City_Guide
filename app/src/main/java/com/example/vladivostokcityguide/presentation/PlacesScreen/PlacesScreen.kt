@@ -1,55 +1,61 @@
 package com.example.vladivostokcityguide.presentation.PlacesScreen
 
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.vladivostokcityguide.data.model.Attraction
-import com.example.vladivostokcityguide.R
-import com.example.vladivostokcityguide.ui.theme.Black
-import com.example.vladivostokcityguide.ui.theme.DarkGray80
-import com.example.vladivostokcityguide.ui.theme.DarkGray90
-import com.example.vladivostokcityguide.ui.theme.DarkerBlack
-import com.example.vladivostokcityguide.ui.theme.NeonGreen
-import com.example.vladivostokcityguide.ui.theme.White
+import com.example.vladivostokcityguide.app.ui.theme.DarkGray80
+import com.example.vladivostokcityguide.app.ui.theme.DarkGray90
+import com.example.vladivostokcityguide.app.ui.theme.DarkerBlack
+import com.example.vladivostokcityguide.app.ui.theme.White
+import com.example.vladivostokcityguide.domain.Filter
+import com.example.vladivostokcityguide.domain.Order
+import com.example.vladivostokcityguide.presentation.common.ErrorDialog
+import com.example.vladivostokcityguide.presentation.common.LandmarkCard
+import com.example.vladivostokcityguide.presentation.common.ShimmerLandmark
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlacesScreen(
-    viewModel: PlacesScreenViewModel = viewModel(),
+    state: PlacesScreenState,
+    onEvent: (PlacesScreenEvent) -> Unit,
     onBackClick: () -> Unit = {},
-    onStartNavigation: (attractionId: Int) -> Unit,
-    barText: String = "Place",
-    initialCategory: String = ""
+    navigateToPlaceDetails: (landmark: String) -> Unit,
 ) {
-    val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(initialCategory) {
-        if (initialCategory.isNotEmpty()) {
-            viewModel.selectCategory(initialCategory)
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,12 +63,14 @@ fun PlacesScreen(
     ) {
         TopAppBar(
             title = {
-                Text(
-                    text = barText,
-                    color = White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                state.selectedCategory?.let {
+                    Text(
+                        text = stringResource(it.nameId),
+                        color = White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             },
             navigationIcon = {
                 IconButton(onClick = onBackClick) {
@@ -79,15 +87,22 @@ fun PlacesScreen(
         )
 
         if (state.isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = White)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                items(count = 5) {
+                    ShimmerLandmark()
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
             }
         } else if (state.error != null) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Error: ${state.error}", color = Color.Red)
-            }
+            ErrorDialog(
+                message = state.error,
+                onRetry = { onEvent(PlacesScreenEvent.OnRetry) },
+            )
         } else {
-            // Tabs Row
             val scrollState = rememberScrollState()
 
             Row(
@@ -95,11 +110,20 @@ fun PlacesScreen(
                     .horizontalScroll(scrollState)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                state.categories.forEach { tab ->
+                // Order
+                val order = state.order
+                TabItem(
+                    title = stringResource(order.resName),
+                    isSelected = true,
+                    onClick = { onEvent(PlacesScreenEvent.OnToggleOrder) },
+                    icon = if (order == Order.DESCENDING) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward
+                )
+                //Filter
+                Filter.entries.filterNot { it == Filter.SAVING_DATE }.forEach { filter ->
                     TabItem(
-                        title = tab,
-                        isSelected = tab == state.selectedCategory,
-                        onClick = { viewModel.selectCategory(tab) }
+                        title = stringResource(filter.labelRes),
+                        isSelected = filter == state.filter,
+                        onClick = { onEvent(PlacesScreenEvent.OnFilterChange(filter)) },
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
@@ -110,10 +134,14 @@ fun PlacesScreen(
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
-                items(state.attractions) { attraction ->
-                    AttractionCard(
-                        attraction = attraction,
-                        onStartClick = { onStartNavigation(attraction.id) }
+                items(state.landmarks) { landmark ->
+                    LandmarkCard(
+                        landmark = landmark,
+                        onClick = { landmark ->
+                            navigateToPlaceDetails(landmark)
+                        },
+                        isSaved = landmark.isSaved,
+                        onToggleSave = { onEvent(PlacesScreenEvent.OnToggleSave(it)) },
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
@@ -127,7 +155,8 @@ fun PlacesScreen(
 fun TabItem(
     title: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    icon: ImageVector? = null
 ) {
     Surface(
         modifier = Modifier
@@ -146,90 +175,25 @@ fun TabItem(
             contentAlignment = Alignment.Center,
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {
-            Text(
-                text = title,
-                color = if (isSelected) Color.White else Color.White.copy(alpha = 0.8f),
-                fontSize = 14.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun AttractionCard(
-    attraction: Attraction,
-    onStartClick: (Attraction) -> Unit = {}
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = attraction.imageRes),
-                contentDescription = attraction.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 32.dp)
-                    .align(Alignment.BottomStart)
-                    .background(color = Black.copy(alpha = 0.6f))
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = attraction.name,
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = attraction.distance,
-                                color = Color.White.copy(alpha = 0.9f),
-                                fontSize = 14.sp
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = attraction.time,
-                                color = Color.White.copy(alpha = 0.9f),
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-
-                    Button(
-                        onClick = { onStartClick(attraction) },
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                icon?.let {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = "icon",
                         modifier = Modifier
-                            .width(78.dp)
-                            .height(48.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = NeonGreen,
-                            contentColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.button_start),
-                            fontSize = 12.sp,
-                            color = Black
-                        )
-                    }
+                            .size(16.dp)
+                            .padding(end = 3.dp)
+                    )
                 }
+
+                Text(
+                    text = title,
+                    color = if (isSelected) Color.White else Color.White.copy(alpha = 0.8f),
+                    fontSize = 14.sp
+                )
             }
+
         }
     }
 }
+

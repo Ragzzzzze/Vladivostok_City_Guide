@@ -1,4 +1,4 @@
-package com.example.vladivostokcityguide.ui.theme
+package com.example.vladivostokcityguide.app.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

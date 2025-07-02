@@ -1,147 +1,185 @@
 package com.example.vladivostokcityguide.presentation.MapScreen
 
-import android.content.pm.PackageManager
-import android.os.Looper
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.vladivostokcityguide.R
+import com.example.vladivostokcityguide.app.ui.theme.NeonGreen
+import com.example.vladivostokcityguide.presentation.MapScreen.components.LandmarkBottomSheetScaffold
+import com.example.vladivostokcityguide.presentation.navigation.Destination
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 
-
+@SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
-    attractionId: Int,
-    onBackClick: () -> Unit
+    navController: NavController,
+    onEvent: (MapScreenEvent) -> Unit,
+    state: MapScreenState,
 ) {
+    val context = LocalContext.current
+    // Загружаем стиль из файла dark_map.json, который должен находиться в res/raw
+    val darkMapStyle = MapStyleOptions.loadRawResourceStyle(context, R.raw.map_theme)
+    val mapProperties = MapProperties(
+        isMyLocationEnabled = true,
+        mapStyleOptions = darkMapStyle
+    )
+
     val vladivostok = LatLng(43.1056, 131.874)
-    val fefu = LatLng(43.025156, 131.893899)
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(vladivostok, 10f)
     }
 
 
-    var userLocation by remember { mutableStateOf(LatLng(0.0, 0.0)) }
+    var userLocation by remember { mutableStateOf(state.currentLocation) }
 
-    LocationTracker { newLocation ->
-        userLocation = newLocation
-    }
-
-    val mapProperties = MapProperties(
-        isMyLocationEnabled = true
-    )
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
 
 
     LaunchedEffect(userLocation) {
-        cameraPositionState.animate(
-            CameraUpdateFactory.newLatLngZoom(userLocation, 15f)
-        )
-    }
-
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState,
-        properties = mapProperties,
-        onMyLocationButtonClick = {false}
-    ){
-        Marker(
-            state = rememberMarkerState(position = fefu),
-            draggable = false,
-            title = "FEFU",
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
-        )
-
-        Marker(
-            state = MarkerState(position = userLocation),
-            title = "Your location",
-            draggable = false,
-        )
-
-
-    }
-}
-
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-fun RequestLocationPermission() {
-    val locationPermissions = rememberMultiplePermissionsState(
-        permissions = listOf(
-            "android.permission.ACCESS_FINE_LOCATION",
-            "android.permission.ACCESS_COARSE_LOCATION"
-        )
-    )
-
-    LaunchedEffect(key1 = locationPermissions.permissions) {
-        locationPermissions.launchMultiplePermissionRequest()
-    }
-}
-
-
-@Composable
-fun LocationTracker(
-    onLocationUpdate: (LatLng) -> Unit
-) {
-    val context = LocalContext.current
-    val fusedLocationClient = remember {
-        LocationServices.getFusedLocationProviderClient(context)
-    }
-
-    val locationCallback = remember {
-        object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                result.lastLocation?.let { location ->
-                    onLocationUpdate(LatLng(location.latitude, location.longitude))
-                }
-            }
-        }
-    }
-    DisposableEffect(Unit) {
-        val locationRequest = LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
-            priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY
-        }
-
-        if (ContextCompat.checkSelfPermission(
-                context,
-                "android.permission.ACCESS_FINE_LOCATION"
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
+        userLocation?.let { (latitude, longitude) ->
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 15f)
             )
         }
+    }
 
-        onDispose {
-            fusedLocationClient.removeLocationUpdates(locationCallback)
+    val selectedLandmark = state.selectedLandmark
+    LaunchedEffect(selectedLandmark) {
+        selectedLandmark?.let {
+            val target = LatLng(it.landmark.latitude, it.landmark.longitude)
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(target, 15f)
+            )
         }
     }
+    LandmarkBottomSheetScaffold(
+        selectedLandmark = selectedLandmark,
+        onDismiss = { onEvent(MapScreenEvent.UnselectLandmark) },
+        onNavigateToDetails = { landmarkJson ->
+            navController.navigate(
+                Destination.LandmarkDetailsScreen(
+                    landmarkJson
+                )
+            )
+        },
+        onToggleShowRoute = { onEvent(MapScreenEvent.ToggleShowRoute) },
+        isLandmarkSaved = false,
+        onToggleSave = { onEvent(MapScreenEvent.ToggleSaveLandmark) },
+    ) { paddingValues ->
+        val customPadding = PaddingValues(
+            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+            top = 0.dp,
+            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+            bottom = paddingValues.calculateBottomPadding()
+        )
+        GoogleMap(
+            modifier = Modifier.fillMaxSize().padding(customPadding),
+            cameraPositionState = cameraPositionState,
+            properties = mapProperties,
+            contentPadding = PaddingValues(bottom = screenHeight / 2),
+//        onMyLocationButtonClick = {false}
+        ) {
+            if (state.landmarks.isNotEmpty()) {
+                state.landmarks.forEach { landmark ->
+                    val position = LatLng(landmark.latitude, landmark.longitude)
+
+                    val landmarkIconColor = if (state.selectedLandmark != null && state.selectedLandmark.landmark == landmark) {
+                        BitmapDescriptorFactory.HUE_GREEN
+                    } else {
+                        BitmapDescriptorFactory.HUE_BLUE
+                    }
+                    Marker(
+                        state = rememberMarkerState(position = position),
+                        draggable = false,
+                        onClick = {
+                            onEvent(MapScreenEvent.SelectLandmark(landmark))
+                            true
+                        },
+                        title = "landmark marker",
+                        icon = BitmapDescriptorFactory.defaultMarker(landmarkIconColor)
+                    )
+                }
+            }
+            val isShowRoute =
+                (selectedLandmark != null) && (selectedLandmark.route != null) && (selectedLandmark.isShowRoute) && (selectedLandmark.route.coordinates.isNotEmpty())
+            if (isShowRoute) {
+                val routePoints = selectedLandmark.route.coordinates.map {
+                    LatLng(it.latitude, it.longitude)
+                }
+                Polyline(
+                    points = routePoints,
+                    color = Color.Green,
+                    width = 17f
+                )
+            }
+            userLocation?.let { (latitude, longitude) ->
+                Marker(
+                    state = MarkerState(position = LatLng(latitude, longitude)),
+                    title = "Your location",
+                    draggable = false,
+                )
+            }
+        }
+
+    }
 }
+
+
+
+
+//    DisposableEffect(Unit) {
+//        val locationRequest = LocationRequest.create().apply {
+//            interval = 10000
+//            fastestInterval = 5000
+//            priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY
+//        }
+//
+//        if (ContextCompat.checkSelfPermission(
+//                context,
+//                "android.permission.ACCESS_FINE_LOCATION"
+//            ) == PackageManager.PERMISSION_GRANTED
+//        ) {
+//            fusedLocationClient.requestLocationUpdates(
+//                locationRequest,
+//                locationCallback,
+//                Looper.getMainLooper()
+//            )
+//        }
+//
+//        onDispose {
+//            fusedLocationClient.removeLocationUpdates(locationCallback)
+//        }
+//    }
