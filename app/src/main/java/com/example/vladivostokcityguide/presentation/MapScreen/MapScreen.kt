@@ -1,23 +1,33 @@
 package com.example.vladivostokcityguide.presentation.MapScreen
 
 import android.annotation.SuppressLint
+import android.view.Surface
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.vladivostokcityguide.R
 import com.example.vladivostokcityguide.app.ui.theme.NeonGreen
@@ -90,13 +100,11 @@ fun MapScreen(
         onDismiss = { onEvent(MapScreenEvent.UnselectLandmark) },
         onNavigateToDetails = { landmarkJson ->
             navController.navigate(
-                Destination.LandmarkDetailsScreen(
-                    landmarkJson
-                )
+                Destination.LandmarkDetailsScreen(landmarkJson)
             )
         },
         onToggleShowRoute = { onEvent(MapScreenEvent.ToggleShowRoute) },
-        isLandmarkSaved = false,
+        isLandmarkSaved = selectedLandmark?.landmark?.isSaved ?: false,
         onToggleSave = { onEvent(MapScreenEvent.ToggleSaveLandmark) },
     ) { paddingValues ->
         val customPadding = PaddingValues(
@@ -105,8 +113,33 @@ fun MapScreen(
             end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
             bottom = paddingValues.calculateBottomPadding()
         )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .zIndex(1f)
+                .padding(start = 12.dp),
+            contentAlignment = Alignment.TopStart
+        ) {
+            Surface(
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(15.dp),
+                color = NeonGreen.copy(alpha = 0.3f),
+                onClick = { navController.navigateUp() }
+            ) {
+                Box(modifier = Modifier.padding(12.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close icon",
+                        tint = NeonGreen
+                    )
+                }
+            }
+
+        }
         GoogleMap(
-            modifier = Modifier.fillMaxSize().padding(customPadding),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(customPadding),
             cameraPositionState = cameraPositionState,
             properties = mapProperties,
             contentPadding = PaddingValues(bottom = screenHeight / 2),

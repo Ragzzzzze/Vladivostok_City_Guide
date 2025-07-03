@@ -73,7 +73,8 @@ fun AppNavigation() {
                     navController.navigate(
                         Destination.LandmarkDetailsScreen(landmark)
                     )
-                }
+                },
+                navigateBack = { navController.navigateUp() }
             )
         }
     }

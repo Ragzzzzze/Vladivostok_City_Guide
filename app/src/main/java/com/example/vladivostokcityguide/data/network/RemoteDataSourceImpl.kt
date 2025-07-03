@@ -22,7 +22,7 @@ class KtorRemoteDataSource(
             PlaceCategory.MUSEUM -> {
                 "1pEJ4i_RqL2w-FG9t8hYH6XglPlmbK-l8"
             }
-            PlaceCategory.OTHER -> TODO("Для прочих пока ничего нет :(")
+            PlaceCategory.OTHER -> "14ZWrI3l-SCC3IbNKNciyD2HOFQ6QinNN"
         }
         val response = client.get {
             url {

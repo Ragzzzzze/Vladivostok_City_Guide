@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -75,7 +76,7 @@ fun LandmarkBottomSheetContent(
     val landmark = selectedLandmark.landmark
     val isRouteFetched = selectedLandmark.route != null
     val isShowRoute = selectedLandmark.isShowRoute
-    Column {
+    Column(modifier = Modifier.systemBarsPadding()) {
         AsyncImage(
             model = landmark.imgUrl,
             contentDescription = "landmark image",
@@ -121,7 +122,7 @@ fun LandmarkBottomSheetContent(
                 }
             }
             Text(
-                text = "Тип, будет скоро ...",
+                text = landmark.type,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(vertical = 3.dp),
                 color = Color.Gray
@@ -358,7 +359,8 @@ fun LandmarkBottomSheetScaffoldPreview() {
         facts = emptyList(),
         time = 15,
         distance = 200,
-        isSaved = false
+        isSaved = false,
+        type = "Мост"
     )
     val route = Route(
         distance = 1234,

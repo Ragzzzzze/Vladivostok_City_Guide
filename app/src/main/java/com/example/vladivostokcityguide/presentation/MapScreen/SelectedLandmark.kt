@@ -5,7 +5,6 @@ import com.example.vladivostokcityguide.domain.models.Route
 
 data class SelectedLandmark(
     val landmark: Landmark,
-    val isSaved: Boolean = false,
     val route: Route? = null,
     val isShowRoute: Boolean = false,
 )

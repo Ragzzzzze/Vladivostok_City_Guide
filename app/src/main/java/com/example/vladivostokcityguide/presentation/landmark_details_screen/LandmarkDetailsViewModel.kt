@@ -74,7 +74,7 @@ class LandmarkDetailsViewModel(
 
     private fun saveLandmark(landmark: Landmark){
         viewModelScope.launch(Dispatchers.IO) {
-            repository.saveLandmark(landmark)
+            repository.saveLandmark(landmark.copy(isSaved = true))
         }
     }
 

@@ -44,12 +44,17 @@ class MapScreenViewModel(
     fun onEvent(event: MapScreenEvent) {
         when (event) {
             MapScreenEvent.ToggleSaveLandmark -> {
-                val selectedLandmark = state.selectedLandmark
+                val selectedLandmark = state.selectedLandmark?.landmark
                 state = state.copy(
-                    selectedLandmark = selectedLandmark!!.copy(
-                        isSaved = !selectedLandmark.isSaved
+                    selectedLandmark = state.selectedLandmark!!.copy(
+                        landmark = selectedLandmark!!.copy(isSaved = !selectedLandmark.isSaved)
                     )
                 )
+                if (!selectedLandmark.isSaved) {
+                    saveLandmark(selectedLandmark)
+                } else {
+                    deleteLandmark(selectedLandmark)
+                }
             }
 
             MapScreenEvent.UnselectLandmark -> {
@@ -126,6 +131,17 @@ class MapScreenViewModel(
                     )
                 }
             }
+        }
+    }
+    private fun saveLandmark(landmark: Landmark){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.saveLandmark(landmark)
+        }
+    }
+
+    private fun deleteLandmark(landmark: Landmark) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteLandmark(landmark)
         }
     }
 }

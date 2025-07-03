@@ -87,7 +87,7 @@ class PlacesScreenViewModel(
                     )
                 }
                 if (!event.landmark.isSaved) {
-                    saveLandmark(event.landmark)
+                    saveLandmark(event.landmark.copy(isSaved = true))
                 } else {
                     deleteLandmark(event.landmark)
                 }
@@ -144,6 +144,10 @@ class PlacesScreenViewModel(
                             error = null
                         )
                     }
+                    filterLandmarks(
+                        _state.value.order,
+                        _state.value.filter
+                    )
                 }
             }
         }

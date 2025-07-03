@@ -43,6 +43,7 @@ import com.example.vladivostokcityguide.app.ui.theme.Black
 import com.example.vladivostokcityguide.app.ui.theme.NeonGreen
 import com.example.vladivostokcityguide.domain.models.Landmark
 import com.example.vladivostokcityguide.presentation.UiUtils
+import java.util.Locale
 import kotlinx.serialization.json.Json
 
 @Composable
@@ -76,13 +77,36 @@ fun LandmarkCard(
                         onClick = { onToggleSave(landmark) }
                     )
                     .align(Alignment.TopEnd)
-                    .background(Color.Black.copy(alpha = 0.15f)),
+                    .background(Color.Black.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    imageVector = if (!isSaved) Icons.Outlined.BookmarkBorder else Icons.Default.Bookmark,
-                    tint = if (!isSaved) Color.White else NeonGreen,
-                    contentDescription = "Save landmark"
+                    Icon(
+                        imageVector = if (!isSaved) Icons.Outlined.BookmarkBorder else Icons.Default.Bookmark,
+                        tint = if (!isSaved) Color.White else NeonGreen,
+                        contentDescription = "Save landmark"
+                    )
+            }
+            // Rating badge
+            Box(
+                modifier = Modifier
+                    .offset(x = 12.dp, y = 15.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.TopStart)
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                val rating = landmark.rating
+                val ratingColor = when {
+                    rating > 4.3 -> NeonGreen
+                    rating > 3.0 -> Color.Yellow
+                    else -> Color.Red.copy(alpha = 0.8f)
+                }
+                Text(
+                    text = String.format(Locale.getDefault(), "%.1f", rating),
+                    color = ratingColor,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
                 )
             }
             Box(

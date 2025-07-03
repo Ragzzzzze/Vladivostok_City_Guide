@@ -19,6 +19,6 @@ fun LandmarkDto.toDomain(
         time = time,
         distance = distance,
         isSaved = isSaved,
+        type = type
     )
-
 }

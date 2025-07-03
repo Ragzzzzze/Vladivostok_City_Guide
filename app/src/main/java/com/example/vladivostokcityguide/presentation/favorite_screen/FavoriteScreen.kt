@@ -15,6 +15,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.outlined.FilterAlt
@@ -47,6 +49,7 @@ fun FavoriteScreen(
     state: FavoriteScreenState,
     onEvent: (FavoriteScreenEvent) -> Unit,
     navigateToDetails: (String) -> Unit,
+    navigateBack: () -> Unit
 ) {
     if (state.isFilterDialogActive) {
         FilterDialog(
@@ -63,9 +66,18 @@ fun FavoriteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Избранное") }
+                title = { Text(text = "Избранное") },
+                navigationIcon = {
+                    IconButton(onClick = navigateBack ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Назад"
+                        )
+                    }
+                }
             )
-        }
+        },
+
     ) { innerPadding ->
         when {
             state.isLoading -> {

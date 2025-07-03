@@ -60,7 +60,7 @@ fun WelcomeScreen(
                         .clip(CircleShape)
                         .clickable(onClick = navigateToFavorites),
                     shape = CircleShape,
-                    color = Color.Gray.copy(alpha = 0.5f)
+                    color = NeonGreen.copy(alpha = 0.3f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(

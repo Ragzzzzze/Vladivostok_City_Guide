@@ -38,12 +38,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vladivostokcityguide.app.ui.theme.Black
 import com.example.vladivostokcityguide.app.ui.theme.DarkGray80
 import com.example.vladivostokcityguide.app.ui.theme.DarkGray90
 import com.example.vladivostokcityguide.app.ui.theme.DarkerBlack
+import com.example.vladivostokcityguide.app.ui.theme.NeonGreen
 import com.example.vladivostokcityguide.app.ui.theme.White
 import com.example.vladivostokcityguide.domain.Filter
 import com.example.vladivostokcityguide.domain.Order
+import com.example.vladivostokcityguide.presentation.MapScreen.MapScreen
 import com.example.vladivostokcityguide.presentation.common.ErrorDialog
 import com.example.vladivostokcityguide.presentation.common.LandmarkCard
 import com.example.vladivostokcityguide.presentation.common.ShimmerLandmark
@@ -116,8 +119,12 @@ fun PlacesScreen(
                     title = stringResource(order.resName),
                     isSelected = true,
                     onClick = { onEvent(PlacesScreenEvent.OnToggleOrder) },
-                    icon = if (order == Order.DESCENDING) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward
+                    icon = if (order == Order.DESCENDING) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
+                    contentColor = Black,
+                    background = NeonGreen.copy(alpha = 0.3f),
+                    selectedBackgroundColor = NeonGreen
                 )
+                Spacer(modifier = Modifier.width(8.dp))
                 //Filter
                 Filter.entries.filterNot { it == Filter.SAVING_DATE }.forEach { filter ->
                     TabItem(
@@ -156,7 +163,11 @@ fun TabItem(
     title: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    icon: ImageVector? = null
+    icon: ImageVector? = null,
+    contentColor: Color = Color.White,
+    background: Color = Color.Gray.copy(alpha = 0.3f),
+    selectedBackgroundColor: Color = DarkGray80,
+    unselectedBackgroundColor: Color = DarkGray90
 ) {
     Surface(
         modifier = Modifier
@@ -164,11 +175,11 @@ fun TabItem(
             .shadow(
                 elevation = if (isSelected) 4.dp else 2.dp,
                 shape = RoundedCornerShape(20.dp),
-                ambientColor = Color.Gray.copy(alpha = 0.3f),
-                spotColor = Color.Gray.copy(alpha = 0.3f)
+                ambientColor = background,
+                spotColor = background
             ),
         shape = RoundedCornerShape(20.dp),
-        color = if (isSelected) DarkGray80 else DarkGray90,
+        color = if (isSelected) selectedBackgroundColor else unselectedBackgroundColor,
         onClick = onClick
     ) {
         Box(
@@ -182,13 +193,14 @@ fun TabItem(
                         contentDescription = "icon",
                         modifier = Modifier
                             .size(16.dp)
-                            .padding(end = 3.dp)
+                            .padding(end = 3.dp),
+                        tint = contentColor
                     )
                 }
 
                 Text(
                     text = title,
-                    color = if (isSelected) Color.White else Color.White.copy(alpha = 0.8f),
+                    color = if (isSelected) contentColor else contentColor.copy(alpha = 0.8f),
                     fontSize = 14.sp
                 )
             }
@@ -196,4 +208,3 @@ fun TabItem(
         }
     }
 }
-
