@@ -2,7 +2,7 @@
 
 An Android app to explore Vladivostok 🏙️ — find places, navigate with maps, and plan your routes easily.
 
-✨ Features & Technologies
+# ✨ Features & Technologies
 
 🎨 Jetpack Compose — Modern UI components
 
@@ -29,7 +29,7 @@ An Android app to explore Vladivostok 🏙️ — find places, navigate with map
 
 # 🎥 App Demo
 
-### 👉 **[Watch the video here](https://github.com/user-attachments/assets/5356d46b-5648-4246-a28f-d145ff418eca)**
+### 👉 **[Watch the video here](https://github.com/user-attachments/assets/14137ce7-3828-463e-9b17-5ff9cc2bac82)**
 
 # 📸 Screenshots
 
